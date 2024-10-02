@@ -1,12 +1,13 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.openapi import OpenApiParameter, OpenApiExample
 
-from .models import Breed
-from .serializers import CatSerializer, BreedSerializer
-
-# Create your views here.
+from .models import Breed, Cat
+from .serializers import CatSerializer, BreedSerializer, UserSerializer
 
 
 class CatsListView(ListCreateAPIView):
@@ -16,12 +17,24 @@ class CatsListView(ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return user.cats_for_owner.all()
+        breed_name = self.request.query_params.get('breed')
+        print(breed_name)
+        if breed_name:
+            return Cat.objects.filter(owner=user, breed__name=breed_name)
+        return Cat.objects.filter(owner=user)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-    
 
+    @extend_schema(parameters=[
+        OpenApiParameter(name='breed',
+                         description='Filter cats by breed name',
+                         required=False,
+                         type=OpenApiTypes.STR,
+                         enum=Breed.objects.values_list('name', flat=True))
+    ])
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class CatsDetailView(RetrieveUpdateDestroyAPIView):
@@ -33,8 +46,14 @@ class CatsDetailView(RetrieveUpdateDestroyAPIView):
         user = self.request.user
         return user.cats_for_owner.all()
 
+
 class BreedListView(ListAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = BreedSerializer
     queryset = Breed.objects.all()
+
+
+class UserRegisterView(CreateAPIView):
+    authentication_classes = []
+    serializer_class = UserSerializer
