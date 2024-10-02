@@ -10,6 +10,57 @@ from .models import Breed, Cat
 from .serializers import CatSerializer, BreedSerializer, UserSerializer
 
 
+@extend_schema(request={
+    'application/x-www-form-urlencoded': {
+        'type': 'object',
+        'properties': {
+            'name': {
+                'type': 'string',
+                'description': 'Name of the cat'
+            },
+            'breed': {
+                'type': 'string',
+                'description': 'Name of the breed',
+                'enum': Breed.objects.values_list('name', flat=True)
+            },
+            'age': {
+                'type': 'integer',
+                'description': 'Age in full months'
+            },
+            'color': {
+                'type': 'string'
+            },
+            'description': {
+                'type': 'string'
+            },
+        },
+        'required': ['name', 'breed', 'age', 'color', 'description'],
+    },
+    'application/json': {
+        'type': 'object',
+        'properties': {
+            'name': {
+                'type': 'string',
+                'description': 'Name of the cat'
+            },
+            'breed': {
+                'type': 'string',
+                'description': 'Name of the breed',
+                'enum': Breed.objects.values_list('name', flat=True),
+            },
+            'age': {
+                'type': 'integer'
+            },
+            'color': {
+                'type': 'string'
+            },
+            'description': {
+                'type': 'string'
+            },
+        },
+        'required': ['name', 'breed', 'age', 'color', 'description'],
+    },
+}, )
 class CatsListView(ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -18,7 +69,6 @@ class CatsListView(ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         breed_name = self.request.query_params.get('breed')
-        print(breed_name)
         if breed_name:
             return Cat.objects.filter(owner=user, breed__name=breed_name)
         return Cat.objects.filter(owner=user)
