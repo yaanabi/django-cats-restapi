@@ -4,7 +4,7 @@ from drf_spectacular.openapi import OpenApiExample
 
 from django.contrib.auth.models import User
 
-from .models import Cat, Breed
+from .models import Cat, Breed, CatRating
 
 
 @extend_schema_serializer(examples=[
@@ -37,10 +37,21 @@ class CatSerializer(serializers.ModelSerializer):
             'Breed with name does not exist. Please choose a valid breed.',
             'invalid': 'Invalid breed selection.'
         })
+    owner = serializers.SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         model = Cat
-        fields = ('id', 'name', 'breed', 'age', 'color', 'description')
+        fields = ('id', 'name', 'breed', 'age', 'color', 'description',
+                  'owner')
+
+
+class CatRatingsSerializer(serializers.ModelSerializer):
+    cat = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    rated_by_user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = CatRating
+        fields = ('id', 'rating', 'cat', 'rated_by_user')
 
 
 class BreedSerializer(serializers.ModelSerializer):

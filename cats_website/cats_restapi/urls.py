@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
 
-from .views import CatsListView, CatsDetailView, BreedListView, UserRegisterView
+from .views import CatsListView, CatsDetailView, BreedListView, UserRegisterView, CatsRatingsView
 
 urlpatterns = [
     # Swagger
@@ -23,6 +23,7 @@ urlpatterns = [
     # CATS
     path('cats/', view=CatsListView.as_view()),
     path('cats/<int:pk>/', view=CatsDetailView.as_view()),
+    path('cats/<int:pk>/ratings/', view=CatsRatingsView.as_view()),
 
     # Breed
     path('breeds/', view=BreedListView.as_view()),

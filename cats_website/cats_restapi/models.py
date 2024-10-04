@@ -30,11 +30,17 @@ class Cat(models.Model):
 
 
 class CatRating(models.Model):
-    rating = models.IntegerField(choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5,
+    rating = models.IntegerField(verbose_name='Rating in range from 1 to 5', choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5,
                                                                            5)])
     cat = models.ForeignKey(Cat,
                             on_delete=models.CASCADE,
                             related_name='cat_ratings')
-    user = models.ForeignKey(User,
+    rated_by_user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              related_name='user_rated')
+    
+    class Meta:
+        unique_together = ('cat', 'rated_by_user')
+
+    def __str__(self) -> str:
+        return f'Rating for {self.cat.name} by {self.rated_by_user.username}'
