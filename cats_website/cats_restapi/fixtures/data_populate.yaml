@@ -59,3 +59,13 @@
     color: black
     description: My cat2
     owner: 3
+
+- model: cats_restapi.Cat
+  pk: 3
+  fields:
+    name: Cat3
+    breed: 2
+    age: 1
+    color: black
+    description: My cat2
+    owner: 2
