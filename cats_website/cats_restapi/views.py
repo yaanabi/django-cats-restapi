@@ -70,8 +70,8 @@ class CatsListView(ListCreateAPIView):
         user = self.request.user
         breed_name = self.request.query_params.get('breed')
         if breed_name:
-            return Cat.objects.filter(owner=user, breed__name=breed_name)
-        return Cat.objects.filter(owner=user)
+            return Cat.objects.filter(breed__name=breed_name)
+        return Cat.objects.all()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
