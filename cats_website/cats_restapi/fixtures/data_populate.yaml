@@ -1,0 +1,61 @@
+- model: auth.user
+  pk: 1
+  fields:
+    password: pbkdf2_sha256$870000$dOb8XX9ICCT39cnqSeafxa$7LUB3ryzA3i6xFHYebh7Dsy8DWnde5WVcX5hGs5FL2w=
+    is_superuser: true
+    username: admin
+    is_staff: true
+    is_active: true
+
+- model: auth.user
+  pk: 2
+  fields:
+    password: pbkdf2_sha256$870000$jTcAQvjuabjndC38jfBIl9$3n13jmI+WL7287I+xEhwG3iCGgzh2DkcPpfa5x18a/Y=
+    is_superuser: False
+    username: user1
+    is_staff: False
+    is_active: true
+
+- model: auth.user
+  pk: 3
+  fields:
+    password: pbkdf2_sha256$870000$YKqysIwzuqDhf6K94QqYUv$kC/k6qhQTlaEQ9J4udNgJLFrDQ4AkZhKIzFxtfZ55vc=
+    is_superuser: False
+    username: user2
+    is_staff: False
+    is_active: true
+
+- model: cats_restapi.Breed
+  pk: 1
+  fields:
+    name: Siberian
+
+- model: cats_restapi.Breed
+  pk: 2
+  fields:
+    name: Siamese
+
+- model: cats_restapi.Breed
+  pk: 3
+  fields:
+    name: Brittish
+
+- model: cats_restapi.Cat
+  pk: 1
+  fields:
+    name: Abushka
+    breed: 1
+    age: 12
+    color: Gray
+    description: My cat
+    owner: 2
+
+- model: cats_restapi.Cat
+  pk: 2
+  fields:
+    name: Cat2
+    breed: 3
+    age: 1
+    color: black
+    description: My cat2
+    owner: 3
