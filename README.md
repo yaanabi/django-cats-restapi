@@ -7,13 +7,16 @@
 
 Swagger doc is available at http://127.0.0.1:1337/schema/swagger-ui/
 
-Prepopulated data:
-1)Superuser: 
-  username: admin
-  password: admin
-2) Users:
-  1) username: user1
-     password: password1
-  2) username: user2
-     password: password2
-3) I also added Breeds and Cats, see admin panel 
+Prepopulated data: </br>
+
+**Superuser:</br>**
+    username: admin</br> 
+    password: admin</br>
+
+ **Users:</br>**
+  1) username: user1</br>
+     password: password1</br>
+  2) username: user2</br>
+     password: password2</br>
+
+**I also added Breeds and Cats, see admin panel**
