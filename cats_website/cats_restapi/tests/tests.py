@@ -43,19 +43,34 @@ def test_user_create_cat(api_client, get_jwt_access_token):
     assert response.data['description'] == 'test description'
     assert response.data['owner'] == 'test_user'
 
-def test_user_update_cat(api_client, get_jwt_access_token):
-    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(get_jwt_access_token))
-    response = api_client.patch('/cats/1/', data={'name': 'testcat', 'breed': 'Brittish', 'age': 2, 'color': 'red', 'description': 'test description'})
+def test_user_update_cat(api_client, get_jwt_access_token_for_username):
+    access = get_jwt_access_token_for_username(username='user1')
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(access))
+    response = api_client.patch('/cats/1/', data={'name': 'updated cat name'})
     assert response.status_code == 200
+    assert response.data['name'] == 'updated cat name'
 
 def test_user_get_cats(api_client, get_jwt_access_token):
-    pass
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(get_jwt_access_token))
+    response = api_client.get('/cats/')
+    assert response.status_code == 200
+    assert len(response.data) == 3
 
 def test_user_get_cats_by_breed(api_client, get_jwt_access_token):
-    pass
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(get_jwt_access_token))
+    response = api_client.get('/cats/?breed=Brittish')
+    assert response.status_code == 200
+    assert len(response.data) == 1
 
-def test_user_delete_cat(api_client, get_jwt_access_token):
-    pass
+def test_user_delete_cat_wrong_user(api_client, get_jwt_access_token):
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(get_jwt_access_token))
+    response = api_client.delete('/cats/1/')
+    assert response.status_code == 403
+
+def test_user_update_cat_wrong_user(api_client, get_jwt_access_token):
+    api_client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(get_jwt_access_token))
+    response = api_client.patch('/cats/1/', data={'name': 'testcat', 'breed': 'Brittish', 'age': 2, 'color': 'red', 'description': 'test description'})
+    assert response.status_code == 403
 
 def test_user_get_cat(api_client, get_jwt_access_token):
     pass

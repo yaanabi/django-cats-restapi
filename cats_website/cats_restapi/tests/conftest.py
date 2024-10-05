@@ -26,3 +26,11 @@ def get_jwt_access_token(create_user) -> AccessToken:
     access_token = AccessToken.for_user(user)
     return access_token
 
+@pytest.fixture
+def get_jwt_access_token_for_username(db) -> AccessToken:
+    def get_token(**kwargs):
+        username = kwargs.get('username')
+        user = User.objects.get(username=username)
+        return AccessToken.for_user(user)
+
+    return get_token
