@@ -11,7 +11,7 @@ services:
     ports:
       - 1234:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d mydb"]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d mydb" ]
       interval: 10s
       retries: 10
   web:
@@ -20,11 +20,15 @@ services:
     entrypoint: ./entrypoint.sh
     volumes:
       - static_volume:/app/cats_website/staticfiles
-      - ./cats_website:/app/cats_website
     expose:
       - 8000
-    env_file:
-      - .env
+    environment:
+      - DJANGO_SECRET_KEY='django-insecure-h6-i*7drtdzjdt2na_utl8muqen!^$o*&p=)au^*2usu$go-@9'
+      - POSTGRES_HOST=db
+      - POSTGRES_DB_NAME=mydb
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_PORT=5432
     depends_on:
       db:
         condition: service_healthy
