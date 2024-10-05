@@ -1,15 +1,15 @@
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseBadRequest
 from django.core.exceptions import ValidationError
 
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.openapi import OpenApiParameter, OpenApiExample
+from drf_spectacular.openapi import OpenApiParameter
 
 from .models import Breed, Cat, CatRating
 from .serializers import CatSerializer, BreedSerializer, UserSerializer, CatRatingsSerializer
@@ -75,7 +75,8 @@ class CatsListView(ListCreateAPIView):
         user = self.request.query_params.get('owner_name')
         breed_name = self.request.query_params.get('breed')
         if breed_name and user:
-            return Cat.objects.filter(breed__name=breed_name, owner__username=user)
+            return Cat.objects.filter(breed__name=breed_name,
+                                      owner__username=user)
         elif breed_name:
             return Cat.objects.filter(breed__name=breed_name)
         elif user:
@@ -105,16 +106,20 @@ class CatsDetailView(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = CatSerializer
+    queryset = Cat.objects.all()
 
-    def get_queryset(self):
-        user = self.request.user
-        return user.cats_for_owner.all()
+    def get_object(self):
+        cat = super().get_object()
+        if cat.owner != self.request.user and self.request.method != 'GET':
+            raise PermissionDenied(detail='You are not the owner of this cat')
+        return cat
+
 
 class CatsRatingsView(ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = CatRatingsSerializer
-    
+
     def get_queryset(self):
         cat = get_object_or_404(Cat, pk=self.kwargs.get('pk'))
         return CatRating.objects.filter(cat=cat)
@@ -123,7 +128,8 @@ class CatsRatingsView(ListCreateAPIView):
         cat = get_object_or_404(Cat, pk=self.kwargs.get('pk'))
         user = self.request.user
         if CatRating.objects.filter(rated_by_user=user, cat=cat).exists():
-            raise serializers.ValidationError(detail=f'{user.username} already rated {cat.name}')
+            raise serializers.ValidationError(
+                detail=f'{user.username} already rated {cat.name}')
         else:
             serializer.save(rated_by_user=user, cat=cat)
 
